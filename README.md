@@ -41,15 +41,15 @@ Then create a main file (`server.go` for example):
 package main
 
 import (
-    "log"
+	"log"
 
     "github.com/ConsoleTVs/cervol"
-    "github.com/ConsoleTVs/cervol/router"
-    "github.com/ConsoleTVs/cervol/request"
-    "github.com/ConsoleTVs/cervol/response"
+	"github.com/ConsoleTVs/cervol/request"
+	"github.com/ConsoleTVs/cervol/response"
+	"github.com/ConsoleTVs/cervol/router"
 )
 
-type Sample struct {
+type sample struct {
 	Name string `json:"name"`
 	Age  int    `json:"age"`
 }
@@ -77,7 +77,7 @@ func middle(next router.Handler) router.Handler {
 
 func main() {
 	// Get the settings from the configuration files.
-	settings := server.GetConfig("./server.toml")
+	settings := cervol.GetConfig("./server.toml")
 	// Set the application routes.
 	routes := router.Create()
 	routes.Get("/", index)
@@ -86,6 +86,6 @@ func main() {
 		routes.Get("/about", about)
 	})
 	// Serve the HTTP server.
-	log.Fatalln(server.Serve(routes, settings))
+	log.Fatalln(cervol.Serve(routes, settings))
 }
 ```

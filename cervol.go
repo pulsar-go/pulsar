@@ -1,4 +1,4 @@
-package server
+package cervol
 
 import (
 	"encoding/json"
@@ -10,9 +10,9 @@ import (
 	"path/filepath"
 
 	"github.com/BurntSushi/toml"
-	"github.com/ConsoleTVs/Cervol/request"
-	"github.com/ConsoleTVs/Cervol/response"
-	"github.com/ConsoleTVs/Cervol/router"
+	"github.com/ConsoleTVs/cervol/request"
+	"github.com/ConsoleTVs/cervol/response"
+	"github.com/ConsoleTVs/cervol/router"
 	"github.com/julienschmidt/httprouter"
 )
 
