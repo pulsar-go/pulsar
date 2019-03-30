@@ -43,7 +43,7 @@ package main
 import (
 	"log"
 
-    "github.com/ConsoleTVs/cervol"
+	"github.com/ConsoleTVs/cervol"
 	"github.com/ConsoleTVs/cervol/request"
 	"github.com/ConsoleTVs/cervol/response"
 	"github.com/ConsoleTVs/cervol/router"
@@ -63,7 +63,7 @@ func user(req *request.HTTP) response.HTTP {
 }
 
 func about(req *request.HTTP) response.HTTP {
-	return response.JSON(Sample{Name: "Erik", Age: 22})
+	return response.JSON(sample{Name: "Erik", Age: 22})
 }
 
 func middle(next router.Handler) router.Handler {
