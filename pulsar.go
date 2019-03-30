@@ -6,11 +6,11 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"os/exec"
 	"path/filepath"
 
 	"github.com/BurntSushi/toml"
 	"github.com/julienschmidt/httprouter"
+	"github.com/kabukky/httpscerts"
 	"github.com/pulsar-go/pulsar/request"
 	"github.com/pulsar-go/pulsar/response"
 	"github.com/pulsar-go/pulsar/router"
@@ -24,10 +24,9 @@ type Settings struct {
 		Development bool   `toml:"development"`
 	} `toml:"server"`
 	HTTPS struct {
-		Enabled                 bool   `toml:"enabled"`
-		AutoGenerateCertificate bool   `toml:"auto_generate_certificate"`
-		CertFile                string `toml:"cert_file"`
-		KeyFile                 string `toml:"key_file"`
+		Enabled  bool   `toml:"enabled"`
+		CertFile string `toml:"cert_file"`
+		KeyFile  string `toml:"key_file"`
 	} `toml:"https"`
 }
 
@@ -48,7 +47,6 @@ func GetConfig(path string) *Settings {
 	// Transform the relative paths into absolute.
 	settings.HTTPS.CertFile, _ = filepath.Abs(filepath.Dir(path) + "/" + filepath.Clean(settings.HTTPS.CertFile))
 	settings.HTTPS.KeyFile, _ = filepath.Abs(filepath.Dir(path) + "/" + filepath.Clean(settings.HTTPS.KeyFile))
-	fmt.Printf("%s\n", settings.HTTPS.CertFile)
 	// Create and return the settings.
 	return settings
 }
@@ -126,59 +124,45 @@ func RegisterRoutes(settings *Settings, mux *httprouter.Router, r *router.Router
 	}
 }
 
-// generateCertificate is a function to generate a certificate given the name.
-func generateCertificate(cert, key string) {
-	cmd := exec.Command("openssl", "genrsa", "-out", key, "2048")
-	if err := cmd.Run(); err != nil {
-		log.Fatalln(err)
-	}
-	cmd2 := exec.Command("openssl", "req", "-new", "-x509", "-key", key, "-out", cert, "-days", "3650", "-subj", "/CN=localhost")
-	if err := cmd2.Run(); err != nil {
-		log.Fatalln(err)
-	}
-}
-
 // Serve starts the server.
 func Serve(router *router.Router, settings *Settings) error {
 	mux := httprouter.New()
 	// Register the application routes.
 	RegisterRoutes(settings, mux, router)
+	// Set the address of the server.
+	address := settings.Server.Host + ":" + settings.Server.Port
 	// Generate a SSL certificate if needed.
 	if settings.HTTPS.Enabled {
-		// Check if auto generation is active.
-		if settings.HTTPS.AutoGenerateCertificate {
-			// Generate a certificate if it does not exist.
-			if !fileExists(settings.HTTPS.CertFile) && !fileExists(settings.HTTPS.KeyFile) {
-				generateCertificate(settings.HTTPS.CertFile, settings.HTTPS.KeyFile)
+		err := httpscerts.Check(settings.HTTPS.CertFile, settings.HTTPS.KeyFile)
+		// If they are not available, generate new ones.
+		if err != nil {
+			err = httpscerts.Generate(settings.HTTPS.CertFile, settings.HTTPS.KeyFile, address)
+			if err != nil {
+				log.Fatal("Unable to create HTTP certificates.")
 			}
 		}
-		// Check if both files exists.
-		if !fileExists(settings.HTTPS.CertFile) || !fileExists(settings.HTTPS.KeyFile) {
-			log.Fatalln("The certificate files are missing or failed to create.")
-		}
 	}
-	address := settings.Server.Host + ":" + settings.Server.Port
 	if settings.Server.Development {
-		fmt.Println("-------------------------------------------------------")
-		fmt.Println("|                                                     |")
-		fmt.Println("|    P U L S A R                                      |")
-		fmt.Println("|    Go Web Micro-framework                           |")
-		fmt.Println("|                                                     |")
-		fmt.Println("|    Erik Campobadal <soc@erik.cat>                   |")
-		fmt.Println("|    Krishan König <krishan.koenig@googlemail.com>    |")
-		fmt.Println("|                                                     |")
-		fmt.Println("-------------------------------------------------------")
+		fmt.Println("-----------------------------------------------------")
+		fmt.Println("|                                                   |")
+		fmt.Println("|  P U L S A R                                      |")
+		fmt.Println("|  Go Web Micro-framework                           |")
+		fmt.Println("|                                                   |")
+		fmt.Println("|  Erik Campobadal <soc@erik.cat>                   |")
+		fmt.Println("|  Krishan König <krishan.koenig@googlemail.com>    |")
+		fmt.Println("|                                                   |")
+		fmt.Println("-----------------------------------------------------")
 		fmt.Println()
 	}
 	if settings.HTTPS.Enabled {
 		if settings.Server.Development {
-			fmt.Printf("Creating a HTTP/2 server with TLS on %s:%s\n", settings.Server.Host, settings.Server.Port)
+			fmt.Printf("Creating a HTTP/2 server with TLS on %s\n", address)
 			fmt.Printf("Certificate: %s\nKey: %s\n\n", settings.HTTPS.CertFile, settings.HTTPS.KeyFile)
 		}
 		return http.ListenAndServeTLS(address, settings.HTTPS.CertFile, settings.HTTPS.KeyFile, mux)
 	}
 	if settings.Server.Development {
-		fmt.Printf("Creating a HTTP/1.1 server on %s:%s\n\n", settings.Server.Host, settings.Server.Port)
+		fmt.Printf("Creating a HTTP/1.1 server on %s\n\n", address)
 	}
 	return http.ListenAndServe(address, mux)
 }
