@@ -1,4 +1,4 @@
-module github.com/ConsoleTVs/Cervol
+module github.com/ConsoleTVs/cervol
 
 go 1.12
 
