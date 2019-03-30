@@ -45,6 +45,8 @@ import (
 
     "github.com/ConsoleTVs/cervol"
     "github.com/ConsoleTVs/cervol/router"
+    "github.com/ConsoleTVs/cervol/request"
+    "github.com/ConsoleTVs/cervol/response"
 )
 
 type Sample struct {
