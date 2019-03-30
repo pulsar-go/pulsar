@@ -1,4 +1,4 @@
-package cervol
+package pulsar
 
 import (
 	"encoding/json"
@@ -16,7 +16,7 @@ import (
 	"github.com/pulsar-go/pulsar/router"
 )
 
-// Settings represents the cervol server settings structure.
+// Settings represents the pulsar server settings structure.
 type Settings struct {
 	Server struct {
 		Host        string `toml:"host"`
@@ -56,8 +56,8 @@ func GetConfig(path string) *Settings {
 // debugHandler is responsible for each http handler in debug mode.
 func developmentHandler(route *router.Route) func(http.ResponseWriter, *http.Request, httprouter.Params) {
 	return func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-		log.Printf("[CERVOL] Request %s \n", r.URL)
-		var res response.HTTP = route.Handler(&request.HTTP{Req: r, Params: ps})
+		log.Printf("[PULSAR] Request %s \n", r.URL)
+		res := route.Handler(&request.HTTP{Req: r, Params: ps})
 		switch res.Type {
 		case response.TextResponse:
 			fmt.Fprint(w, res.TextData)
@@ -77,7 +77,7 @@ func developmentHandler(route *router.Route) func(http.ResponseWriter, *http.Req
 // productionHandler is responsible for each http handler in debug mode.
 func productionHandler(route *router.Route) func(http.ResponseWriter, *http.Request, httprouter.Params) {
 	return func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-		var res response.HTTP = route.Handler(&request.HTTP{Req: r, Params: ps})
+		res := route.Handler(&request.HTTP{Req: r, Params: ps})
 		switch res.Type {
 		case response.TextResponse:
 			fmt.Fprint(w, res.TextData)
