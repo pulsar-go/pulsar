@@ -89,3 +89,10 @@ func main() {
 	log.Fatalln(cervol.Serve(routes, settings))
 }
 ```
+
+## Documentation
+
+- Cervol: <https://godoc.org/github.com/ConsoleTVs/cervol>
+- Request: <https://godoc.org/github.com/ConsoleTVs/cervol/request>
+- Response: <https://godoc.org/github.com/ConsoleTVs/cervol/response>
+- Router <https://godoc.org/github.com/ConsoleTVs/cervol/router>
