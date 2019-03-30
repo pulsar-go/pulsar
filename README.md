@@ -23,7 +23,7 @@ go get github.com/ConsoleTVs/cervol
 
 Then you'll need to create some server configuration (`server.toml` for example):
 
-```
+```toml
 [server]
     host = ""
     port = "8080"
