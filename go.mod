@@ -1,4 +1,4 @@
-module github.com/ConsoleTVs/cervol
+module github.com/pulsar-go/pulsar
 
 go 1.12
 

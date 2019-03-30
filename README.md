@@ -1,4 +1,4 @@
-# Cervol - A Go Web Micro-framework for web artisans
+# Pulsar - A Go Web Micro-framework for web artisans
 
 This is a go web microframework for web artisans willing to create amazing go web applications with ease.
 
@@ -18,7 +18,7 @@ This is a go web microframework for web artisans willing to create amazing go we
 You first need to get the package:
 
 ```
-go get github.com/ConsoleTVs/cervol
+go get github.com/pulsar-go/pulsar
 ```
 
 Then you'll need to create some server configuration (`server.toml` for example):
@@ -43,10 +43,10 @@ package main
 import (
 	"log"
 
-	"github.com/ConsoleTVs/cervol"
-	"github.com/ConsoleTVs/cervol/request"
-	"github.com/ConsoleTVs/cervol/response"
-	"github.com/ConsoleTVs/cervol/router"
+	"github.com/pulsar-go/pulsar"
+	"github.com/pulsar-go/pulsar/request"
+	"github.com/pulsar-go/pulsar/response"
+	"github.com/pulsar-go/pulsar/router"
 )
 
 type sample struct {
@@ -77,7 +77,7 @@ func middle(next router.Handler) router.Handler {
 
 func main() {
 	// Get the settings from the configuration files.
-	settings := cervol.GetConfig("./server.toml")
+	settings := pulsar.GetConfig("./server.toml")
 	// Set the application routes.
 	routes := router.Create()
 	routes.Get("/", index)
@@ -86,13 +86,13 @@ func main() {
 		routes.Get("/about", about)
 	})
 	// Serve the HTTP server.
-	log.Fatalln(cervol.Serve(routes, settings))
+	log.Fatalln(pulsar.Serve(routes, settings))
 }
 ```
 
 ## Documentation
 
-- Cervol: <https://godoc.org/github.com/ConsoleTVs/cervol>
-- Request: <https://godoc.org/github.com/ConsoleTVs/cervol/request>
-- Response: <https://godoc.org/github.com/ConsoleTVs/cervol/response>
-- Router <https://godoc.org/github.com/ConsoleTVs/cervol/router>
+- Pulsar: <https://godoc.org/github.com/pulsar-go/pulsar>
+- Request: <https://godoc.org/github.com/pulsar-go/pulsar/request>
+- Response: <https://godoc.org/github.com/pulsar-go/pulsar/response>
+- Router <https://godoc.org/github.com/pulsar-go/pulsar/router>

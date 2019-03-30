@@ -1,8 +1,8 @@
 package router
 
 import (
-	"github.com/ConsoleTVs/cervol/request"
-	"github.com/ConsoleTVs/cervol/response"
+	"github.com/pulsar-go/pulsar/request"
+	"github.com/pulsar-go/pulsar/response"
 )
 
 // Handler represents a route handler.

@@ -10,10 +10,10 @@ import (
 	"path/filepath"
 
 	"github.com/BurntSushi/toml"
-	"github.com/ConsoleTVs/cervol/request"
-	"github.com/ConsoleTVs/cervol/response"
-	"github.com/ConsoleTVs/cervol/router"
 	"github.com/julienschmidt/httprouter"
+	"github.com/pulsar-go/pulsar/request"
+	"github.com/pulsar-go/pulsar/response"
+	"github.com/pulsar-go/pulsar/router"
 )
 
 // Settings represents the cervol server settings structure.
@@ -159,13 +159,15 @@ func Serve(router *router.Router, settings *Settings) error {
 	}
 	address := settings.Server.Host + ":" + settings.Server.Port
 	if settings.Server.Development {
-		fmt.Println("----------------------------------------")
-		fmt.Println("|                                      |")
-		fmt.Println("| C E R V O L - Go Web Micro-framework |")
-		fmt.Println("|                                      |")
-		fmt.Println("|    Erik Campobadal <soc@erik.cat>    |")
-		fmt.Println("|                                      |")
-		fmt.Println("----------------------------------------")
+		fmt.Println("-------------------------------------------------------")
+		fmt.Println("|                                                     |")
+		fmt.Println("|    P U L S A R                                      |")
+		fmt.Println("|    Go Web Micro-framework                           |")
+		fmt.Println("|                                                     |")
+		fmt.Println("|    Erik Campobadal <soc@erik.cat>                   |")
+		fmt.Println("|    Krishan König <krishan.koenig@googlemail.com>    |")
+		fmt.Println("|                                                     |")
+		fmt.Println("-------------------------------------------------------")
 		fmt.Println()
 	}
 	if settings.HTTPS.Enabled {
