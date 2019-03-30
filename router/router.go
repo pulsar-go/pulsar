@@ -1,8 +1,8 @@
 package router
 
 import (
-	"github.com/ConsoleTVs/Cervol/request"
-	"github.com/ConsoleTVs/Cervol/response"
+	"github.com/ConsoleTVs/cervol/request"
+	"github.com/ConsoleTVs/cervol/response"
 )
 
 // Handler represents a route handler.
