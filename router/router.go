@@ -40,9 +40,7 @@ func Create() *Router {
 
 // CreateWithOptions creates a new router (routes) given the options.
 func CreateWithOptions(options *Options) *Router {
-	r := new(Router)
-	r.options = *options
-	return r
+	return &Router{options: *options}
 }
 
 // Adds the route to the given router.

@@ -21,6 +21,8 @@ You first need to get the package:
 go get github.com/pulsar-go/pulsar
 ```
 
+**IMPORTANT**: Check the official example here: <https://github.com/pulsar-go/example>
+
 Then you'll need to create some server configuration (`server.toml` for example):
 
 ```toml
@@ -31,9 +33,11 @@ Then you'll need to create some server configuration (`server.toml` for example)
 
 [https]
     enabled = true
-    auto_generate_certificate = true
     cert_file = "./server.cert"
     key_file = "./server.key"
+
+[views]
+    path = "./views"
 ```
 
 Then create a main file (`server.go` for example):
@@ -43,10 +47,11 @@ package main
 import (
 	"log"
 
-	"github.com/pulsar-go/pulsar"
+    "github.com/pulsar-go/pulsar"
+    "github.com/pulsar-go/pulsar/config"
+    "github.com/pulsar-go/pulsar/router"
 	"github.com/pulsar-go/pulsar/request"
 	"github.com/pulsar-go/pulsar/response"
-	"github.com/pulsar-go/pulsar/router"
 )
 
 type sample struct {
@@ -77,22 +82,23 @@ func middle(next router.Handler) router.Handler {
 
 func main() {
 	// Get the settings from the configuration files.
-	settings := pulsar.GetConfig("./server.toml")
+	config.Set("./server.toml")
 	// Set the application routes.
 	routes := router.Create()
-	routes.Get("/", index)
-	routes.Get("/user/:id", user)
-	routes.Group(&router.Options{Prefix: "/sample", Middleware: middle}, func(routes *router.Router) {
-		routes.Get("/about", about)
+	routes.Get("/", sample.Index)
+	routes.Get("/user/:id", sample.User)
+	routes.Group(&router.Options{Prefix: "/sample", Middleware: middlewares.Middle}, func(routes *router.Router) {
+		routes.Get("/about", sample.About)
 	})
 	// Serve the HTTP server.
-	log.Fatalln(pulsar.Serve(routes, settings))
+	log.Fatalln(pulsar.Serve(routes))
 }
 ```
 
 ## Documentation
 
 - Pulsar: <https://godoc.org/github.com/pulsar-go/pulsar>
+- Config: <https://godoc.org/github.com/pulsar-go/pulsar/config>
+- Router: <https://godoc.org/github.com/pulsar-go/pulsar/router>
 - Request: <https://godoc.org/github.com/pulsar-go/pulsar/request>
 - Response: <https://godoc.org/github.com/pulsar-go/pulsar/response>
-- Router <https://godoc.org/github.com/pulsar-go/pulsar/router>
