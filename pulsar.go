@@ -69,7 +69,8 @@ func RegisterRoutes(mux *httprouter.Router, r *router.Router) {
 }
 
 // Serve starts the server.
-func Serve(router *router.Router) error {
+func Serve() error {
+	router := &router.Routes
 	mux := httprouter.New()
 	// Register the application routes.
 	RegisterRoutes(mux, router)
