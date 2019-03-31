@@ -71,7 +71,7 @@ func about(req *request.HTTP) response.HTTP {
 	return response.JSON(sample{Name: "Erik", Age: 22})
 }
 
-func middle(next router.Handler) router.Handler {
+func sampleMiddleware(next router.Handler) router.Handler {
 	return router.Handler(func(req *request.HTTP) response.HTTP {
 		log.Println("Before route middleware")
 		r := next(req)
@@ -84,14 +84,14 @@ func main() {
 	// Get the settings from the configuration files.
 	config.Set("./server.toml")
 	// Set the application routes.
-	routes := router.Create()
-	routes.Get("/", sample.Index)
-	routes.Get("/user/:id", sample.User)
-	routes.Group(&router.Options{Prefix: "/sample", Middleware: middlewares.Middle}, func(routes *router.Router) {
-		routes.Get("/about", sample.About)
-	})
+	router.Routes.
+        Get("/", index).
+        Get("/user/:id", user).
+        Group(&router.Options{Prefix: "/sample", Middleware: sampleMiddleware}, func(routes *router.Router) {
+            routes.Get("/about", about)
+        })
 	// Serve the HTTP server.
-	log.Fatalln(pulsar.Serve(routes))
+	log.Fatalln(pulsar.Serve())
 }
 ```
 
