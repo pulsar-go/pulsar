@@ -9,6 +9,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"github.com/kabukky/httpscerts"
 	"github.com/pulsar-go/pulsar/config"
+	"github.com/pulsar-go/pulsar/database"
 	"github.com/pulsar-go/pulsar/request"
 	"github.com/pulsar-go/pulsar/router"
 )
@@ -22,7 +23,7 @@ func fileExists(path string) bool {
 // debugHandler is responsible for each http handler in debug mode.
 func developmentHandler(route *router.Route) func(http.ResponseWriter, *http.Request, httprouter.Params) {
 	return func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-		log.Printf("[PULSAR] Request %s \n", r.URL)
+		log.Printf("[PULSAR] Request %s\n", r.URL)
 		res := route.Handler(&request.HTTP{Req: r, Params: ps})
 		res.Handle(w)
 	}
@@ -87,11 +88,18 @@ func Serve() error {
 			}
 		}
 	}
+	// Set the database configuration
+	database.Open(&config.Settings.Database)
+	defer database.DB.Close()
+	// Migrate if nessesary
+	if config.Settings.Database.AutoMigrate {
+		database.DB.AutoMigrate(database.Models...)
+	}
 	if config.Settings.Server.Development {
 		fmt.Println("-----------------------------------------------------")
 		fmt.Println("|                                                   |")
 		fmt.Println("|  P U L S A R                                      |")
-		fmt.Println("|  Go Web Micro-framework                           |")
+		fmt.Println("|  Go Web framework                                 |")
 		fmt.Println("|                                                   |")
 		fmt.Println("|  Erik Campobadal <soc@erik.cat>                   |")
 		fmt.Println("|  Krishan König <krishan.koenig@googlemail.com>    |")
