@@ -19,8 +19,8 @@ type Type uint
 const (
 	TextResponse Type = iota
 	JSONResponse
+	StaticResponse
 	ViewResponse
-	TemplateResponse
 )
 
 // HTTP is the web server response.
@@ -40,45 +40,45 @@ func JSON(data interface{}) HTTP {
 	return HTTP{Type: JSONResponse, JSONData: data}
 }
 
-// View return a View response without templating data.
-func View(name string) HTTP {
+// Static return a View response without templating data.
+func Static(name string) HTTP {
 	path, err := filepath.Abs(filepath.Clean(config.Settings.Views.Path) + "/" + filepath.Clean(name))
 	if err != nil {
 		log.Fatalln(err)
 	}
-	return HTTP{Type: ViewResponse, TextData: path}
+	return HTTP{Type: StaticResponse, TextData: path}
 }
 
-// Template return a View response with templating data.
-func Template(name string, data interface{}) HTTP {
+// View return a View response with templating data.
+func View(name string, data interface{}) HTTP {
 	path, err := filepath.Abs(filepath.Clean(config.Settings.Views.Path) + "/" + filepath.Clean(name))
 	if err != nil {
 		log.Fatalln(err)
 	}
-	return HTTP{Type: TemplateResponse, TextData: path, JSONData: data}
+	return HTTP{Type: ViewResponse, TextData: path, JSONData: data}
 }
 
 // Handle handles the HTTP request using a response writter.
-func (res *HTTP) Handle(w http.ResponseWriter) {
-	switch res.Type {
+func (response *HTTP) Handle(writer http.ResponseWriter) {
+	switch response.Type {
 	case TextResponse:
-		fmt.Fprint(w, res.TextData)
+		fmt.Fprint(writer, response.TextData)
 	case JSONResponse:
-		w.Header().Set("Content-Type", "application/json")
-		result, err := json.Marshal(res.JSONData)
+		writer.Header().Set("Content-Type", "application/json")
+		result, err := json.Marshal(response.JSONData)
 		if err != nil {
-			fmt.Fprint(w, "Error while marshaling JSON.")
+			fmt.Fprint(writer, "Error while marshaling JSON.")
 		}
-		fmt.Fprint(w, string(result))
+		fmt.Fprint(writer, string(result))
+	case StaticResponse:
+		content, err := ioutil.ReadFile(response.TextData)
+		if err != nil {
+			log.Println("File " + response.TextData + " not found.")
+		}
+		fmt.Fprintf(writer, string(content))
 	case ViewResponse:
-		content, err := ioutil.ReadFile(res.TextData)
-		if err != nil {
-			log.Println("File " + res.TextData + " not found.")
-		}
-		fmt.Fprintf(w, string(content))
-	case TemplateResponse:
-		template.Must(template.ParseFiles(res.TextData)).Execute(w, res.JSONData)
+		template.Must(template.ParseFiles(response.TextData)).Execute(writer, response.JSONData)
 	default:
-		fmt.Fprint(w, "Invalid HTTP response type.")
+		fmt.Fprint(writer, "Invalid HTTP response type.")
 	}
 }
