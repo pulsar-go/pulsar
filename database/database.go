@@ -21,7 +21,7 @@ type DBsettings struct {
 	Port        string `toml:"port"`
 	User        string `toml:"user"`
 	Password    string `toml:"password"`
-	AutoMigrate bool   `toml:"auto_migrate`
+	AutoMigrate bool   `toml:"auto_migrate"`
 }
 
 // Model represents the base database model.
