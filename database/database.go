@@ -7,7 +7,6 @@ import (
 	"github.com/jinzhu/gorm"
 
 	// The following imports are for the database drivers.
-	_ "github.com/jinzhu/gorm/dialects/mssql"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
@@ -49,8 +48,6 @@ func Open(s *DBsettings) {
 		args = fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s", s.Host, s.Port, s.User, s.Database, s.Password)
 	case "sqlite3":
 		args = s.Database
-	case "mssql":
-		args = fmt.Sprintf("sqlserver://%s:%s@%s:%s?database=%s", s.User, s.Password, s.Host, s.Port, s.Database)
 	default:
 		log.Fatalf("Database driver '%s' is not supported.\n", s.Driver)
 	}

@@ -78,7 +78,7 @@ Then you'll need to create some server configuration (`server.toml` for example)
 [database]
     # Determines the driver to use
     # Possible options are:
-    # 'mysql', 'postgres', 'sqlite3', 'mssql'.
+    # 'mysql', 'postgres', 'sqlite3'.
     driver = "mysql"
     # Database represents the database name
     # to use or the database path in case of
