@@ -44,13 +44,13 @@ func Open(s *DBsettings) {
 	var args string
 	switch s.Driver {
 	case "mysql":
-		args = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", s.user, s.Password, s.Host, s.Port, s.Database)
+		args = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", s.User, s.Password, s.Host, s.Port, s.Database)
 	case "postgres":
 		args = fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s", s.Host, s.Port, s.User, s.Database, s.Password)
 	case "sqlite3":
 		args = s.Database
 	case "mssql":
-		args = fmt.Sprintf("sqlserver://%s:%s@%s:%s?database=%s", s.Username, s.Password, s.Host, s.Port, s.Database)
+		args = fmt.Sprintf("sqlserver://%s:%s@%s:%s?database=%s", s.User, s.Password, s.Host, s.Port, s.Database)
 	default:
 		log.Fatalf("Database driver '%s' is not supported.\n", s.Driver)
 	}
