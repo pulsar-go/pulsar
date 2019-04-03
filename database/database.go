@@ -55,5 +55,9 @@ func Open(s *DBsettings) {
 		log.Fatalf("Database driver '%s' is not supported.\n", s.Driver)
 	}
 	// Open the database
-	DB, err := gorm.Open(s.Driver, args)
+	dbOpened, err := gorm.Open(s.Driver, args)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	DB = dbOpened
 }
