@@ -12,8 +12,8 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 )
 
-// DBsettings represents a global database settings.
-type DBsettings struct {
+// DBconfigs represents a global database settings.
+type DBconfigs struct {
 	Driver      string `toml:"driver"`
 	Database    string `toml:"database"`
 	Host        string `toml:"host"`
@@ -38,21 +38,21 @@ func AddModels(models ...interface{}) {
 }
 
 // Open opens a new database connection.
-func Open(s *DBsettings) {
+func Open(config *DBconfigs) {
 	// Create the arguments
 	var args string
-	switch s.Driver {
+	switch config.Driver {
 	case "mysql":
-		args = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", s.User, s.Password, s.Host, s.Port, s.Database)
+		args = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", config.User, config.Password, config.Host, config.Port, config.Database)
 	case "postgres":
-		args = fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s", s.Host, s.Port, s.User, s.Database, s.Password)
+		args = fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s", config.Host, config.Port, config.User, config.Database, config.Password)
 	case "sqlite3":
-		args = s.Database
+		args = config.Database
 	default:
-		log.Fatalf("Database driver '%s' is not supported.\n", s.Driver)
+		log.Fatalf("Database driver '%s' is not supported.\n", config.Driver)
 	}
 	// Open the database
-	dbOpened, err := gorm.Open(s.Driver, args)
+	dbOpened, err := gorm.Open(config.Driver, args)
 	if err != nil {
 		log.Fatalln(err)
 	}

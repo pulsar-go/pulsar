@@ -15,15 +15,17 @@ type Config struct {
 		Port        string `toml:"port"`
 		Development bool   `toml:"development"`
 	} `toml:"server"`
+
 	HTTPS struct {
 		Enabled  bool   `toml:"enabled"`
 		CertFile string `toml:"cert_file"`
 		KeyFile  string `toml:"key_file"`
 	} `toml:"https"`
+
 	Views struct {
 		Path string `toml:"path"`
 	} `toml:"views"`
-	Database database.DBsettings `toml:"database"`
+	Database database.DBconfigs `toml:"database"`
 }
 
 // Settings define the global settings for pulsar.

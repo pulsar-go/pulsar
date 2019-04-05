@@ -22,18 +22,18 @@ func fileExists(path string) bool {
 
 // debugHandler is responsible for each http handler in debug mode.
 func developmentHandler(route *router.Route) func(http.ResponseWriter, *http.Request, httprouter.Params) {
-	return func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-		log.Printf("[PULSAR] Request %s\n", r.URL)
-		res := route.Handler(&request.HTTP{Req: r, Params: ps})
-		res.Handle(w)
+	return func(writer http.ResponseWriter, req *http.Request, params httprouter.Params) {
+		log.Printf("[PULSAR] Request %s\n", req.URL)
+		response := route.Handler(&request.HTTP{Request: req, Params: params})
+		response.Handle(writer)
 	}
 }
 
 // productionHandler is responsible for each http handler in debug mode.
 func productionHandler(route *router.Route) func(http.ResponseWriter, *http.Request, httprouter.Params) {
-	return func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-		res := route.Handler(&request.HTTP{Req: r, Params: ps})
-		res.Handle(w)
+	return func(writer http.ResponseWriter, req *http.Request, params httprouter.Params) {
+		response := route.Handler(&request.HTTP{Request: req, Params: params})
+		response.Handle(writer)
 	}
 }
 
@@ -41,13 +41,14 @@ func productionHandler(route *router.Route) func(http.ResponseWriter, *http.Requ
 func RegisterRoutes(mux *httprouter.Router, r *router.Router) {
 	// Register the routes.
 	var handler func(*router.Route) func(http.ResponseWriter, *http.Request, httprouter.Params)
+
 	if config.Settings.Server.Development {
 		handler = developmentHandler
 	} else {
 		handler = productionHandler
 	}
-	for _, element := range r.Routes {
-		route := element
+
+	for _, route := range r.Routes {
 		switch route.Method {
 		case request.GetRequest:
 			mux.GET(route.URI, handler(&route))
@@ -63,9 +64,10 @@ func RegisterRoutes(mux *httprouter.Router, r *router.Router) {
 			mux.DELETE(route.URI, handler(&route))
 		}
 	}
+
 	// Register his childs.
-	for _, element := range r.Childs {
-		RegisterRoutes(mux, element)
+	for _, route := range r.Childs {
+		RegisterRoutes(mux, route)
 	}
 }
 
@@ -77,24 +79,18 @@ func Serve() error {
 	RegisterRoutes(mux, router)
 	// Set the address of the server.
 	address := config.Settings.Server.Host + ":" + config.Settings.Server.Port
-	// Generate a SSL certificate if needed.
-	if config.Settings.HTTPS.Enabled {
-		err := httpscerts.Check(config.Settings.HTTPS.CertFile, config.Settings.HTTPS.KeyFile)
-		// If they are not available, generate new ones.
-		if err != nil {
-			err = httpscerts.Generate(config.Settings.HTTPS.CertFile, config.Settings.HTTPS.KeyFile, address)
-			if err != nil {
-				log.Fatal("Unable to create HTTP certificates.")
-			}
-		}
-	}
+
+	generateSSLCertificate(address)
+
 	// Set the database configuration
 	database.Open(&config.Settings.Database)
 	defer database.DB.Close()
+
 	// Migrate if nessesary
 	if config.Settings.Database.AutoMigrate {
 		database.DB.AutoMigrate(database.Models...)
 	}
+
 	if config.Settings.Server.Development {
 		fmt.Println("-----------------------------------------------------")
 		fmt.Println("|                                                   |")
@@ -107,6 +103,7 @@ func Serve() error {
 		fmt.Println("-----------------------------------------------------")
 		fmt.Println()
 	}
+
 	if config.Settings.HTTPS.Enabled {
 		if config.Settings.Server.Development {
 			fmt.Printf("Creating a HTTP/2 server with TLS on %s\n", address)
@@ -114,8 +111,29 @@ func Serve() error {
 		}
 		return http.ListenAndServeTLS(address, config.Settings.HTTPS.CertFile, config.Settings.HTTPS.KeyFile, mux)
 	}
+
 	if config.Settings.Server.Development {
 		fmt.Printf("Creating a HTTP/1.1 server on %s\n\n", address)
 	}
+
 	return http.ListenAndServe(address, mux)
+}
+
+// generateSSLCertificate creates an ssl certificate if https is enabled
+func generateSSLCertificate(address string) {
+	// Generate a SSL certificate if needed.
+	if !config.Settings.HTTPS.Enabled {
+		return
+	}
+
+	err := httpscerts.Check(config.Settings.HTTPS.CertFile, config.Settings.HTTPS.KeyFile)
+	if err == nil {
+		return
+	}
+
+	// If they are not available, generate new ones.
+	err = httpscerts.Generate(config.Settings.HTTPS.CertFile, config.Settings.HTTPS.KeyFile, address)
+	if err != nil {
+		log.Fatal("Unable to create HTTP certificates.")
+	}
 }
