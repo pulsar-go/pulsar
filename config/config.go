@@ -5,7 +5,6 @@ import (
 	"path/filepath"
 
 	"github.com/BurntSushi/toml"
-	"github.com/pulsar-go/pulsar/database"
 )
 
 // Config represents the pulsar server settings structure.
@@ -23,7 +22,23 @@ type Config struct {
 	Views struct {
 		Path string `toml:"path"`
 	} `toml:"views"`
-	Database database.DBsettings `toml:"database"`
+	Database struct {
+		Driver      string `toml:"driver"`
+		Database    string `toml:"database"`
+		Host        string `toml:"host"`
+		Port        string `toml:"port"`
+		User        string `toml:"user"`
+		Password    string `toml:"password"`
+		AutoMigrate bool   `toml:"auto_migrate"`
+	} `toml:"database"`
+	Mail struct {
+		Host     string `toml:"host"`
+		Port     string `toml:"port"`
+		Identity string `toml:"identity"`
+		Username string `toml:"username"`
+		Password string `toml:"password"`
+		From     string `toml:"from"`
+	} `toml:"mail"`
 }
 
 // Settings define the global settings for pulsar.

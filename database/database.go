@@ -5,23 +5,13 @@ import (
 	"log"
 
 	"github.com/jinzhu/gorm"
+	"github.com/pulsar-go/pulsar/config"
 
 	// The following imports are for the database drivers.
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 )
-
-// DBsettings represents a global database settings.
-type DBsettings struct {
-	Driver      string `toml:"driver"`
-	Database    string `toml:"database"`
-	Host        string `toml:"host"`
-	Port        string `toml:"port"`
-	User        string `toml:"user"`
-	Password    string `toml:"password"`
-	AutoMigrate bool   `toml:"auto_migrate"`
-}
 
 // Model represents the base database model.
 type Model gorm.Model
@@ -38,9 +28,11 @@ func AddModels(models ...interface{}) {
 }
 
 // Open opens a new database connection.
-func Open(s *DBsettings) {
+func Open() {
 	// Create the arguments
 	var args string
+	// Copy to reduce code size.
+	s := &config.Settings.Database
 	switch s.Driver {
 	case "mysql":
 		args = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", s.User, s.Password, s.Host, s.Port, s.Database)

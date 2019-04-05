@@ -24,7 +24,7 @@ func fileExists(path string) bool {
 func developmentHandler(route *router.Route) func(http.ResponseWriter, *http.Request, httprouter.Params) {
 	return func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		log.Printf("[PULSAR] Request %s\n", r.URL)
-		res := route.Handler(&request.HTTP{Req: r, Params: ps})
+		res := route.Handler(&request.HTTP{Request: r, Params: ps})
 		res.Handle(w)
 	}
 }
@@ -32,7 +32,7 @@ func developmentHandler(route *router.Route) func(http.ResponseWriter, *http.Req
 // productionHandler is responsible for each http handler in debug mode.
 func productionHandler(route *router.Route) func(http.ResponseWriter, *http.Request, httprouter.Params) {
 	return func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-		res := route.Handler(&request.HTTP{Req: r, Params: ps})
+		res := route.Handler(&request.HTTP{Request: r, Params: ps})
 		res.Handle(w)
 	}
 }
@@ -89,7 +89,7 @@ func Serve() error {
 		}
 	}
 	// Set the database configuration
-	database.Open(&config.Settings.Database)
+	database.Open()
 	defer database.DB.Close()
 	// Migrate if nessesary
 	if config.Settings.Database.AutoMigrate {

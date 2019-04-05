@@ -1,4 +1,4 @@
-# Pulsar - A Go Web Micro-framework for web artisans
+# Pulsar - A Go Web framework for web artisans
 
 This is a go web microframework for web artisans willing to create amazing go web applications with ease.
 
@@ -12,6 +12,8 @@ This is a go web microframework for web artisans willing to create amazing go we
 - Automatic headers for different responses
 - Automatic TLS (SSL) certificate using openssl cli
 - Automatic server creation using HTTP/1.1 or HTTP/2
+- Database Configuration + ORM
+- Emails
 
 ## How to use
 
