@@ -110,6 +110,29 @@ Then you'll need to create some server configuration (`server.toml` for example)
     # existing column’s type or delete unused columns
     # to protect your data.
     auto_migrate = true
+
+# Mail stores all the information about
+# SMTP mailing to send any form of email.
+[mail]
+    # Host determines the SMTP host that
+    # is going to be used.
+    host = "smtp.mailtrap.io"
+    # Port determines the SMTP port that
+    # is going to be used.
+    port = "465"
+    # Identity determines how the auth is
+    # pretended to act as. Usually this
+    # should be an empty string.
+    identity = ""
+    # Username used to authenticate when connecting
+    # to the host. Part of the credentials.
+    username = ""
+    # Password used to authenticate when connecting
+    # to the host. Part of the credentials.
+    password = ""
+    # From determines who the mail is going to be sent
+    # from. This setting is the default from address used.
+    from = "mail@example.com"
 ```
 
 Then create a main file (`server.go` for example):
