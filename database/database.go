@@ -16,8 +16,13 @@ import (
 // Model represents the base database model.
 type Model gorm.Model
 
+// DB represents the database structure used
+type DB struct {
+	Lib *gorm.DB
+}
+
 // DB represents the current database used.
-var DB *gorm.DB
+var db *DB
 
 // Models stores the current set of application models.
 var Models []interface{}
@@ -48,5 +53,17 @@ func Open() {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	DB = dbOpened
+	db = NewDB(dbOpened)
+}
+
+// Lib returns the underlying library instance
+func Lib() *gorm.DB {
+	return db.Lib
+}
+
+// NewDB converts a Lib response into a DB response
+func NewDB(db *gorm.DB) *DB {
+	newDB := new(DB)
+	newDB.Lib = db
+	return newDB
 }

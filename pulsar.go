@@ -90,10 +90,10 @@ func Serve() error {
 	}
 	// Set the database configuration
 	database.Open()
-	defer database.DB.Close()
+	defer database.Lib().Close()
 	// Migrate if nessesary
 	if config.Settings.Database.AutoMigrate {
-		database.DB.AutoMigrate(database.Models...)
+		database.Lib().AutoMigrate(database.Models...)
 	}
 	if config.Settings.Server.Development {
 		fmt.Println("-----------------------------------------------------")
