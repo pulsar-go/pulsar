@@ -77,17 +77,9 @@ func Serve() error {
 	RegisterRoutes(mux, router)
 	// Set the address of the server.
 	address := config.Settings.Server.Host + ":" + config.Settings.Server.Port
-	// Generate a SSL certificate if needed.
-	if config.Settings.HTTPS.Enabled {
-		err := httpscerts.Check(config.Settings.HTTPS.CertFile, config.Settings.HTTPS.KeyFile)
-		// If they are not available, generate new ones.
-		if err != nil {
-			err = httpscerts.Generate(config.Settings.HTTPS.CertFile, config.Settings.HTTPS.KeyFile, address)
-			if err != nil {
-				log.Fatal("Unable to create HTTP certificates.")
-			}
-		}
-	}
+
+	generateSSLCertificate(address)
+
 	// Set the database configuration
 	database.Open()
 	defer database.DB.Close()
@@ -118,4 +110,23 @@ func Serve() error {
 		fmt.Printf("Creating a HTTP/1.1 server on %s\n\n", address)
 	}
 	return http.ListenAndServe(address, mux)
+}
+
+// generateSSLCertificate creates an ssl certificate if https is enabled
+func generateSSLCertificate(address string) {
+	// Generate a SSL certificate if needed.
+	if !config.Settings.HTTPS.Enabled {
+		return
+	}
+
+	err := httpscerts.Check(config.Settings.HTTPS.CertFile, config.Settings.HTTPS.KeyFile)
+	if err == nil {
+		return
+	}
+
+	// If they are not available, generate new ones.
+	err = httpscerts.Generate(config.Settings.HTTPS.CertFile, config.Settings.HTTPS.KeyFile, address)
+	if err != nil {
+		log.Fatal("Unable to create HTTP certificates.")
+	}
 }
