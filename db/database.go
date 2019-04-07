@@ -18,8 +18,11 @@ type Model gorm.Model
 
 // DB represents the database structure used
 type DB struct {
-	lib *gorm.DB
+	*gorm.DB
 }
+
+// Builder represents the current database used.
+var Builder *DB
 
 // Models stores the current set of application models.
 var Models []interface{}
@@ -51,24 +54,23 @@ func Open() {
 		log.Fatalln(err)
 	}
 
-	Builder = new(DB)
-	SetLib(dbOpened)
+	Builder = NewDB(dbOpened)
+}
+
+// NewDB converts a Lib response into a DB response
+func NewDB(db *gorm.DB) *DB {
+	newDB := &DB{db}
+	return newDB
 }
 
 // GetLib returns the underlying DB instance
 func GetLib() *gorm.DB {
-	return Builder.lib
+	return Builder.DB
 }
 
-// SetLib set's the builder's db instance
-func SetLib(lib *gorm.DB) *DB {
-	Builder.lib = lib
-	return Builder
-}
-
-func (b *DB) clone() *DB {
+func (b *DB) clone(lib *gorm.DB) *DB {
 	new := &DB{
-		lib: b.lib,
+		lib,
 	}
 
 	return new
