@@ -39,6 +39,9 @@ type Config struct {
 		Password string `toml:"password"`
 		From     string `toml:"from"`
 	} `toml:"mail"`
+	Queue struct {
+		Routines string `toml:"routines"`
+	} `toml:"queue"`
 }
 
 // Settings define the global settings for pulsar.

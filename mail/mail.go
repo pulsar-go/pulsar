@@ -6,6 +6,7 @@ import (
 	"net/textproto"
 
 	"github.com/pulsar-go/pulsar/config"
+	"github.com/pulsar-go/pulsar/queue"
 
 	"github.com/jordan-wright/email"
 )
@@ -91,9 +92,21 @@ func (m *Mail) AttachFile(filename string) *Mail {
 	return m
 }
 
+// SendNow sends the mail.
+func (m *Mail) SendNow() error {
+	// Copy to keep the code length considerable.
+	s := &config.Settings.Mail
+	return m.Message.Send(s.Host+":"+s.Port, smtp.PlainAuth(s.Identity, s.Username, s.Password, s.Host))
+}
+
 // Send sends the mail.
 func (m *Mail) Send() error {
 	// Copy to keep the code length considerable.
 	s := &config.Settings.Mail
-	return m.Message.Send(s.Host+":"+s.Port, smtp.PlainAuth(s.Identity, s.Username, s.Password, s.Host))
+	return queue.Dispatch(func() {
+		err := m.Message.Send(s.Host+":"+s.Port, smtp.PlainAuth(s.Identity, s.Username, s.Password, s.Host))
+		if err != nil {
+			log.Println(err)
+		}
+	})
 }

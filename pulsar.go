@@ -5,11 +5,13 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/kabukky/httpscerts"
 	"github.com/pulsar-go/pulsar/config"
 	"github.com/pulsar-go/pulsar/db"
+	"github.com/pulsar-go/pulsar/queue"
 	"github.com/pulsar-go/pulsar/request"
 	"github.com/pulsar-go/pulsar/router"
 )
@@ -77,9 +79,8 @@ func Serve() error {
 	RegisterRoutes(mux, router)
 	// Set the address of the server.
 	address := config.Settings.Server.Host + ":" + config.Settings.Server.Port
-
+	// Generate SSL.
 	generateSSLCertificate(address)
-
 	// Set the database configuration
 	db.Open()
 	defer db.Builder.Close()
@@ -87,6 +88,13 @@ func Serve() error {
 	if config.Settings.Database.AutoMigrate {
 		db.Builder.AutoMigrate(db.Models...)
 	}
+	// Configure the queue system.
+	routines, err := strconv.ParseInt(config.Settings.Queue.Routines, 10, 32)
+	if err != nil {
+		log.Fatal(err)
+	}
+	queue.NewPool(int(routines))
+	defer queue.Pool.Release()
 	if config.Settings.Server.Development {
 		fmt.Println("-----------------------------------------------------")
 		fmt.Println("|                                                   |")
