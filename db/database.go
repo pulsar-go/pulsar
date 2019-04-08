@@ -1,4 +1,4 @@
-package database
+package db
 
 import (
 	"fmt"
@@ -18,11 +18,11 @@ type Model gorm.Model
 
 // DB represents the database structure used
 type DB struct {
-	Lib *gorm.DB
+	*gorm.DB
 }
 
-// DB represents the current database used.
-var db *DB
+// Builder represents the current database used.
+var Builder *DB
 
 // Models stores the current set of application models.
 var Models []interface{}
@@ -53,17 +53,13 @@ func Open() {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	db = NewDB(dbOpened)
+
+	Builder = &DB{dbOpened}
 }
 
-// Lib returns the underlying library instance
-func Lib() *gorm.DB {
-	return db.Lib
-}
-
-// NewDB converts a Lib response into a DB response
-func NewDB(db *gorm.DB) *DB {
-	newDB := new(DB)
-	newDB.Lib = db
-	return newDB
+// clone creates a new instance of the DB
+func (b *DB) clone(lib *gorm.DB) *DB {
+	return &DB{
+		lib,
+	}
 }

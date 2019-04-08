@@ -9,7 +9,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"github.com/kabukky/httpscerts"
 	"github.com/pulsar-go/pulsar/config"
-	"github.com/pulsar-go/pulsar/database"
+	"github.com/pulsar-go/pulsar/db"
 	"github.com/pulsar-go/pulsar/request"
 	"github.com/pulsar-go/pulsar/router"
 )
@@ -81,11 +81,11 @@ func Serve() error {
 	generateSSLCertificate(address)
 
 	// Set the database configuration
-	database.Open()
-	defer database.Lib().Close()
+	db.Open()
+	defer db.Builder.Close()
 	// Migrate if nessesary
 	if config.Settings.Database.AutoMigrate {
-		database.Lib().AutoMigrate(database.Models...)
+		db.Builder.AutoMigrate(db.Models...)
 	}
 	if config.Settings.Server.Development {
 		fmt.Println("-----------------------------------------------------")
