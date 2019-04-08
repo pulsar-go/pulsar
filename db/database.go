@@ -54,24 +54,18 @@ func Open() {
 		log.Fatalln(err)
 	}
 
-	Builder = NewDB(dbOpened)
+	Builder = &DB{dbOpened}
 }
 
-// NewDB converts a Lib response into a DB response
-func NewDB(db *gorm.DB) *DB {
-	newDB := &DB{db}
-	return newDB
-}
+// // NewDB converts a Lib response into a DB response
+// func NewDB(db *gorm.DB) *DB {
+// 	newDB := &DB{db}
+// 	return newDB
+// }
 
-// GetLib returns the underlying DB instance
-func GetLib() *gorm.DB {
-	return Builder.DB
-}
-
+// clone creates a new instance of the DB
 func (b *DB) clone(lib *gorm.DB) *DB {
-	new := &DB{
+	return &DB{
 		lib,
 	}
-
-	return new
 }
