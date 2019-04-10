@@ -42,7 +42,7 @@ func JSON(data interface{}) HTTP {
 
 // Static return a View response without templating data.
 func Static(name string) HTTP {
-	path, err := filepath.Abs(filepath.Clean(config.Settings.Views.Path) + "/" + filepath.Clean(name))
+	path, err := filepath.Abs(filepath.Clean(config.Settings.Views.Path) + "/" + filepath.Clean(name+".html"))
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -51,7 +51,7 @@ func Static(name string) HTTP {
 
 // View return a View response with templating data.
 func View(name string, data interface{}) HTTP {
-	path, err := filepath.Abs(filepath.Clean(config.Settings.Views.Path) + "/" + filepath.Clean(name))
+	path, err := filepath.Abs(filepath.Clean(config.Settings.Views.Path) + "/" + filepath.Clean(name+".gohtml"))
 	if err != nil {
 		log.Fatalln(err)
 	}
