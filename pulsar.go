@@ -107,12 +107,12 @@ func Serve() error {
 		fmt.Println("-----------------------------------------------------")
 		fmt.Println()
 	}
-	if config.Settings.HTTPS.Enabled {
+	if config.Settings.Certificate.Enabled {
 		if config.Settings.Server.Development {
 			fmt.Printf("Creating a HTTP/2 server with TLS on %s\n", address)
-			fmt.Printf("Certificate: %s\nKey: %s\n\n", config.Settings.HTTPS.CertFile, config.Settings.HTTPS.KeyFile)
+			fmt.Printf("Certificate: %s\nKey: %s\n\n", config.Settings.Certificate.CertFile, config.Settings.Certificate.KeyFile)
 		}
-		return http.ListenAndServeTLS(address, config.Settings.HTTPS.CertFile, config.Settings.HTTPS.KeyFile, mux)
+		return http.ListenAndServeTLS(address, config.Settings.Certificate.CertFile, config.Settings.Certificate.KeyFile, mux)
 	}
 	if config.Settings.Server.Development {
 		fmt.Printf("Creating a HTTP/1.1 server on %s\n\n", address)
@@ -123,17 +123,17 @@ func Serve() error {
 // generateSSLCertificate creates an ssl certificate if https is enabled
 func generateSSLCertificate(address string) {
 	// Generate a SSL certificate if needed.
-	if !config.Settings.HTTPS.Enabled {
+	if !config.Settings.Certificate.Enabled {
 		return
 	}
 
-	err := httpscerts.Check(config.Settings.HTTPS.CertFile, config.Settings.HTTPS.KeyFile)
+	err := httpscerts.Check(config.Settings.Certificate.CertFile, config.Settings.Certificate.KeyFile)
 	if err == nil {
 		return
 	}
 
 	// If they are not available, generate new ones.
-	err = httpscerts.Generate(config.Settings.HTTPS.CertFile, config.Settings.HTTPS.KeyFile, address)
+	err = httpscerts.Generate(config.Settings.Certificate.CertFile, config.Settings.Certificate.KeyFile, address)
 	if err != nil {
 		log.Fatal("Unable to create HTTP certificates.")
 	}
