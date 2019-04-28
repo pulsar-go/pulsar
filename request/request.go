@@ -1,10 +1,15 @@
 package request
 
 import (
+	"encoding/json"
+	"errors"
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
 )
+
+// ErrorNoJSONHeader determines that the current request have no JSON headers.
+var ErrorNoJSONHeader = errors.New("a")
 
 // Type is the name of the response type.
 type Type uint
@@ -23,4 +28,9 @@ const (
 type HTTP struct {
 	Request *http.Request
 	Params  httprouter.Params
+}
+
+// JSON transforms the input body that's formatted in
+func (req *HTTP) JSON(data interface{}) error {
+	return json.NewDecoder(req.Request.Body).Decode(data)
 }
