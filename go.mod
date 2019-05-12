@@ -13,4 +13,5 @@ require (
 	github.com/lib/pq v1.0.0 // indirect
 	github.com/mattn/go-sqlite3 v1.10.0 // indirect
 	github.com/panjf2000/ants v4.0.2+incompatible
+	github.com/rs/cors v1.3.0
 )

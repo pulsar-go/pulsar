@@ -14,6 +14,7 @@ import (
 	"github.com/pulsar-go/pulsar/queue"
 	"github.com/pulsar-go/pulsar/request"
 	"github.com/pulsar-go/pulsar/router"
+	"github.com/rs/cors"
 )
 
 // fileExists determines if a file exists in a given path.
@@ -79,6 +80,16 @@ func Serve() error {
 	mux := httprouter.New()
 	// Register the application routes.
 	RegisterRoutes(mux, router)
+	// Register the CORS
+	handler := cors.New(cors.Options{
+		AllowedOrigins:     config.Settings.Server.AllowedOrigins,
+		AllowedHeaders:     config.Settings.Server.AllowedHeaders,
+		AllowedMethods:     config.Settings.Server.AllowedMethods,
+		AllowCredentials:   config.Settings.Server.AllowCredentials,
+		ExposedHeaders:     config.Settings.Server.ExposedHeaders,
+		Debug:              config.Settings.Server.Development,
+		OptionsPassthrough: true,
+	}).Handler(mux)
 	// Set the address of the server.
 	address := config.Settings.Server.Host + ":" + config.Settings.Server.Port
 	// Generate SSL.
@@ -114,12 +125,12 @@ func Serve() error {
 			fmt.Printf("Creating a HTTP/2 server with TLS on %s\n", address)
 			fmt.Printf("Certificate: %s\nKey: %s\n\n", config.Settings.Certificate.CertFile, config.Settings.Certificate.KeyFile)
 		}
-		return http.ListenAndServeTLS(address, config.Settings.Certificate.CertFile, config.Settings.Certificate.KeyFile, mux)
+		return http.ListenAndServeTLS(address, config.Settings.Certificate.CertFile, config.Settings.Certificate.KeyFile, handler)
 	}
 	if config.Settings.Server.Development {
 		fmt.Printf("Creating a HTTP/1.1 server on %s\n\n", address)
 	}
-	return http.ListenAndServe(address, mux)
+	return http.ListenAndServe(address, handler)
 }
 
 // generateSSLCertificate creates an ssl certificate if https is enabled

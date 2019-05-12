@@ -9,9 +9,14 @@ import (
 
 // ServerConfig specifies the configuration for the server file.
 type ServerConfig struct {
-	Host        string `toml:"host"`
-	Port        string `toml:"port"`
-	Development bool   `toml:"development"`
+	Host             string   `toml:"host"`
+	Port             string   `toml:"port"`
+	Development      bool     `toml:"development"`
+	AllowedOrigins   []string `toml:"allowed_origins"`
+	AllowedHeaders   []string `toml:"allowed_headers"`
+	AllowedMethods   []string `toml:"allowed_methods"`
+	ExposedHeaders   []string `toml:"exposed_headers"`
+	AllowCredentials bool     `toml:"allow_credentials"`
 }
 
 // CertificateConfig specifies the configuration for the certificate file.
