@@ -6,10 +6,10 @@ import (
 	"html/template"
 	"io/ioutil"
 	"log"
-	"net/http"
 	"path/filepath"
 
 	"github.com/pulsar-go/pulsar/config"
+	"github.com/pulsar-go/pulsar/request"
 )
 
 // Type is the name of the response type.
@@ -44,7 +44,7 @@ func JSON(data interface{}) HTTP {
 func Static(name string) HTTP {
 	path, err := filepath.Abs(filepath.Clean(config.Settings.Views.Path) + "/" + filepath.Clean(name+".html"))
 	if err != nil {
-		log.Fatalln(err)
+		log.Println(err)
 	}
 	return HTTP{Type: StaticResponse, TextData: path}
 }
@@ -53,13 +53,14 @@ func Static(name string) HTTP {
 func View(name string, data interface{}) HTTP {
 	path, err := filepath.Abs(filepath.Clean(config.Settings.Views.Path) + "/" + filepath.Clean(name+".gohtml"))
 	if err != nil {
-		log.Fatalln(err)
+		log.Println(err)
 	}
 	return HTTP{Type: ViewResponse, TextData: path, JSONData: data}
 }
 
 // Handle handles the HTTP request using a response writter.
-func (response *HTTP) Handle(writer http.ResponseWriter) {
+func (response *HTTP) Handle(req *request.HTTP) {
+	writer := req.Writer
 	switch response.Type {
 	case TextResponse:
 		fmt.Fprint(writer, response.TextData)

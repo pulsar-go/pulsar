@@ -27,6 +27,7 @@ const (
 // HTTP represents the web server request.
 type HTTP struct {
 	Request *http.Request
+	Writer  http.ResponseWriter
 	Params  httprouter.Params
 }
 

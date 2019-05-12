@@ -26,16 +26,18 @@ func fileExists(path string) bool {
 func developmentHandler(route *router.Route) func(http.ResponseWriter, *http.Request, httprouter.Params) {
 	return func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		log.Printf("[PULSAR] Request %s\n", r.URL)
-		res := route.Handler(&request.HTTP{Request: r, Params: ps})
-		res.Handle(w)
+		req := &request.HTTP{Request: r, Writer: w, Params: ps}
+		res := route.Handler(req)
+		res.Handle(req)
 	}
 }
 
 // productionHandler is responsible for each http handler in debug mode.
 func productionHandler(route *router.Route) func(http.ResponseWriter, *http.Request, httprouter.Params) {
 	return func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-		res := route.Handler(&request.HTTP{Request: r, Params: ps})
-		res.Handle(w)
+		req := &request.HTTP{Request: r, Writer: w, Params: ps}
+		res := route.Handler(req)
+		res.Handle(req)
 	}
 }
 
