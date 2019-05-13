@@ -6,6 +6,7 @@ import (
 	"html/template"
 	"io/ioutil"
 	"log"
+	"net/http"
 	"path/filepath"
 
 	"github.com/pulsar-go/pulsar/config"
@@ -25,19 +26,34 @@ const (
 
 // HTTP is the web server response.
 type HTTP struct {
-	Type     Type
-	TextData string
-	JSONData interface{}
+	StatusCode int
+	Type       Type
+	TextData   string
+	JSONData   interface{}
 }
 
 // Text returns a HTTP response with plain text.
 func Text(text string) HTTP {
-	return HTTP{Type: TextResponse, TextData: text}
+	return HTTP{StatusCode: http.StatusOK, Type: TextResponse, TextData: text}
+}
+
+// TextWithCode is a Text response with additional status code.
+func TextWithCode(text string, code int) HTTP {
+	res := Text(text)
+	res.StatusCode = code
+	return res
 }
 
 // JSON returns a HTTP response with the JSON headers.
 func JSON(data interface{}) HTTP {
-	return HTTP{Type: JSONResponse, JSONData: data}
+	return HTTP{StatusCode: http.StatusOK, Type: JSONResponse, JSONData: data}
+}
+
+// JSONWithCode is a JSON response with additional status code.
+func JSONWithCode(data interface{}, code int) HTTP {
+	res := JSON(data)
+	res.StatusCode = code
+	return res
 }
 
 // Static return a View response without templating data.
@@ -46,7 +62,14 @@ func Static(name string) HTTP {
 	if err != nil {
 		log.Println(err)
 	}
-	return HTTP{Type: StaticResponse, TextData: path}
+	return HTTP{StatusCode: http.StatusOK, Type: StaticResponse, TextData: path}
+}
+
+// StaticWithCode is a Static response with additional status code.
+func StaticWithCode(name string, code int) HTTP {
+	res := Static(name)
+	res.StatusCode = code
+	return res
 }
 
 // View return a View response with templating data.
@@ -55,12 +78,20 @@ func View(name string, data interface{}) HTTP {
 	if err != nil {
 		log.Println(err)
 	}
-	return HTTP{Type: ViewResponse, TextData: path, JSONData: data}
+	return HTTP{StatusCode: http.StatusOK, Type: ViewResponse, TextData: path, JSONData: data}
+}
+
+// ViewWithCode is a View response with additional code.
+func ViewWithCode(name string, data interface{}, code int) HTTP {
+	res := View(name, data)
+	res.StatusCode = code
+	return res
 }
 
 // Handle handles the HTTP request using a response writter.
 func (response *HTTP) Handle(req *request.HTTP) {
 	writer := req.Writer
+	writer.WriteHeader(response.StatusCode)
 	switch response.Type {
 	case TextResponse:
 		fmt.Fprint(writer, response.TextData)
