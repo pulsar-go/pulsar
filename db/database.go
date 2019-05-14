@@ -3,6 +3,7 @@ package db
 import (
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/jinzhu/gorm"
 	"github.com/pulsar-go/pulsar/config"
@@ -14,7 +15,12 @@ import (
 )
 
 // Model represents the base database model.
-type Model gorm.Model
+type Model struct {
+	ID        uint       `json:"id,omitempty" gorm:"primary_key"`
+	CreatedAt time.Time  `json:"created_at,omitempty"`
+	UpdatedAt time.Time  `json:"updated_at,omitempty"`
+	DeletedAt *time.Time `json:"deleted_at,omitempty" sql:"index"`
+}
 
 // DB represents the database structure used
 type DB struct {
