@@ -1,6 +1,7 @@
 package request
 
 import (
+	"bufio"
 	"encoding/json"
 	"errors"
 	"net/http"
@@ -34,6 +35,8 @@ type HTTP struct {
 
 // JSON transforms the input body that's formatted in
 func (req *HTTP) JSON(data interface{}) error {
-	bodyCopy := req.Request.Body
-	return json.NewDecoder(bodyCopy).Decode(data)
+	buffer := bufio.NewReader(req.Request.Body)
+	err := json.NewDecoder(buffer).Decode(data)
+	buffer.Reset(req.Request.Body)
+	return err
 }
