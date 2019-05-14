@@ -1,9 +1,10 @@
 package request
 
 import (
-	"bufio"
+	"bytes"
 	"encoding/json"
 	"errors"
+	"io"
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
@@ -35,8 +36,7 @@ type HTTP struct {
 
 // JSON transforms the input body that's formatted in
 func (req *HTTP) JSON(data interface{}) error {
-	buffer := bufio.NewReader(req.Request.Body)
-	err := json.NewDecoder(buffer).Decode(data)
-	buffer.Reset(req.Request.Body)
-	return err
+	buf := new(bytes.Buffer)
+	io.Copy(buf, req.Request.Body)
+	return json.NewDecoder(buf).Decode(data)
 }
