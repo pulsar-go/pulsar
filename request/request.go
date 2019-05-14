@@ -26,12 +26,14 @@ const (
 
 // HTTP represents the web server request.
 type HTTP struct {
-	Request *http.Request
-	Writer  http.ResponseWriter
-	Params  httprouter.Params
+	Request     *http.Request
+	Writer      http.ResponseWriter
+	Params      httprouter.Params
+	Additionals map[string]interface{}
 }
 
 // JSON transforms the input body that's formatted in
 func (req *HTTP) JSON(data interface{}) error {
-	return json.NewDecoder(req.Request.Body).Decode(data)
+	bodyCopy := req.Request.Body
+	return json.NewDecoder(bodyCopy).Decode(data)
 }
