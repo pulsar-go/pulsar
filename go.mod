@@ -12,6 +12,6 @@ require (
 	github.com/kabukky/httpscerts v0.0.0-20150320125433-617593d7dcb3
 	github.com/lib/pq v1.0.0 // indirect
 	github.com/mattn/go-sqlite3 v1.10.0 // indirect
-	github.com/panjf2000/ants v4.0.2+incompatible
+	github.com/panjf2000/ants v1.0.0
 	github.com/rs/cors v1.3.0
 )
