@@ -91,9 +91,9 @@ func ViewWithCode(name string, data interface{}, code int) HTTP {
 // Handle handles the HTTP request using a response writter.
 func (response *HTTP) Handle(req *request.HTTP) {
 	writer := req.Writer
-	writer.WriteHeader(response.StatusCode)
 	switch response.Type {
 	case TextResponse:
+		writer.WriteHeader(response.StatusCode)
 		fmt.Fprint(writer, response.TextData)
 	case JSONResponse:
 		writer.Header().Set("Content-Type", "application/json")
@@ -101,16 +101,20 @@ func (response *HTTP) Handle(req *request.HTTP) {
 		if err != nil {
 			fmt.Fprint(writer, "Error while marshaling JSON.")
 		}
+		writer.WriteHeader(response.StatusCode)
 		fmt.Fprint(writer, string(result))
 	case StaticResponse:
 		content, err := ioutil.ReadFile(response.TextData)
 		if err != nil {
 			log.Println("File " + response.TextData + " not found.")
 		}
+		writer.WriteHeader(response.StatusCode)
 		fmt.Fprintf(writer, string(content))
 	case ViewResponse:
+		writer.WriteHeader(response.StatusCode)
 		template.Must(template.ParseFiles(response.TextData)).Execute(writer, response.JSONData)
 	default:
+		writer.WriteHeader(response.StatusCode)
 		fmt.Fprint(writer, "Invalid HTTP response type.")
 	}
 }
