@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	"io"
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
@@ -29,6 +28,7 @@ const (
 // HTTP represents the web server request.
 type HTTP struct {
 	Request     *http.Request
+	Body        string
 	Writer      http.ResponseWriter
 	Params      httprouter.Params
 	Additionals map[string]interface{}
@@ -36,7 +36,5 @@ type HTTP struct {
 
 // JSON transforms the input body that's formatted in
 func (req *HTTP) JSON(data interface{}) error {
-	buf := new(bytes.Buffer)
-	io.Copy(buf, req.Request.Body)
-	return json.NewDecoder(buf).Decode(data)
+	return json.NewDecoder(bytes.NewBufferString(req.Body)).Decode(data)
 }

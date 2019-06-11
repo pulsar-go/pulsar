@@ -1,7 +1,9 @@
 package pulsar
 
 import (
+	"bytes"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -28,6 +30,12 @@ func developmentHandler(route *router.Route) func(http.ResponseWriter, *http.Req
 	return func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		log.Printf("[PULSAR] Request %s\n", r.URL)
 		req := &request.HTTP{Request: r, Writer: w, Params: ps}
+		buff, err := ioutil.ReadAll(req.Request.Body)
+		if err != nil {
+			log.Printf("[PULSAR] Failed to read the request body\n")
+		}
+		req.Body = string(buff)
+		req.Request.Body = ioutil.NopCloser(bytes.NewBuffer(buff))
 		res := route.Handler(req)
 		res.Handle(req)
 	}
@@ -37,6 +45,9 @@ func developmentHandler(route *router.Route) func(http.ResponseWriter, *http.Req
 func productionHandler(route *router.Route) func(http.ResponseWriter, *http.Request, httprouter.Params) {
 	return func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		req := &request.HTTP{Request: r, Writer: w, Params: ps}
+		buff, _ := ioutil.ReadAll(req.Request.Body)
+		req.Body = string(buff)
+		req.Request.Body = ioutil.NopCloser(bytes.NewBuffer(buff))
 		res := route.Handler(req)
 		res.Handle(req)
 	}
