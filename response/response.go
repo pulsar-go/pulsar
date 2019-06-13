@@ -21,6 +21,7 @@ const (
 	TextResponse Type = iota
 	JSONResponse
 	StaticResponse
+	AssetResponse
 	ViewResponse
 )
 
@@ -72,6 +73,15 @@ func StaticWithCode(name string, code int) HTTP {
 	return res
 }
 
+// Asset return an asset response (css files, js files, images, etc.).
+func Asset(name string) HTTP {
+	path, err := filepath.Abs(filepath.Clean(config.Settings.Views.Path) + "/" + filepath.Clean(name))
+	if err != nil {
+		log.Println(err)
+	}
+	return HTTP{StatusCode: http.StatusOK, Type: AssetResponse, TextData: path}
+}
+
 // View return a View response with templating data.
 func View(name string, data interface{}) HTTP {
 	path, err := filepath.Abs(filepath.Clean(config.Settings.Views.Path) + "/" + filepath.Clean(name+".gohtml"))
@@ -103,7 +113,7 @@ func (response *HTTP) Handle(req *request.HTTP) {
 		}
 		writer.WriteHeader(response.StatusCode)
 		fmt.Fprint(writer, string(result))
-	case StaticResponse:
+	case StaticResponse, AssetResponse:
 		content, err := ioutil.ReadFile(response.TextData)
 		if err != nil {
 			log.Println("File " + response.TextData + " not found.")
