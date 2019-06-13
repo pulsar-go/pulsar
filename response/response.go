@@ -121,7 +121,7 @@ func (response *HTTP) Handle(req *request.HTTP) {
 		}
 		writer.Header().Set("Content-Type", mime.TypeByExtension(filepath.Ext(response.TextData)))
 		writer.WriteHeader(response.StatusCode)
-		fmt.Fprintf(writer, string(content))
+		fmt.Fprint(writer, string(content))
 	case ViewResponse:
 		writer.WriteHeader(response.StatusCode)
 		template.Must(template.ParseFiles(response.TextData)).Execute(writer, response.JSONData)
