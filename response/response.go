@@ -6,6 +6,7 @@ import (
 	"html/template"
 	"io/ioutil"
 	"log"
+	"mime"
 	"net/http"
 	"path/filepath"
 
@@ -106,11 +107,11 @@ func (response *HTTP) Handle(req *request.HTTP) {
 		writer.WriteHeader(response.StatusCode)
 		fmt.Fprint(writer, response.TextData)
 	case JSONResponse:
-		writer.Header().Set("Content-Type", "application/json")
 		result, err := json.Marshal(response.JSONData)
 		if err != nil {
 			fmt.Fprint(writer, "Error while marshaling JSON.")
 		}
+		writer.Header().Set("Content-Type", "application/json")
 		writer.WriteHeader(response.StatusCode)
 		fmt.Fprint(writer, string(result))
 	case StaticResponse, AssetResponse:
@@ -118,6 +119,7 @@ func (response *HTTP) Handle(req *request.HTTP) {
 		if err != nil {
 			log.Println("File " + response.TextData + " not found.")
 		}
+		writer.Header().Set("Content-Type", mime.TypeByExtension(filepath.Ext(response.TextData)))
 		writer.WriteHeader(response.StatusCode)
 		fmt.Fprintf(writer, string(content))
 	case ViewResponse:
