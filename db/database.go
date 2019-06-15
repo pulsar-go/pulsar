@@ -3,6 +3,8 @@ package db
 import (
 	"fmt"
 	"log"
+	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/jinzhu/gorm"
@@ -50,7 +52,11 @@ func Open() {
 	case "postgres":
 		args = fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s", s.Host, s.Port, s.User, s.Database, s.Password)
 	case "sqlite3":
-		args = s.Database
+		f, err := filepath.Abs(filepath.Dir(os.Args[0]) + "/" + s.Database)
+		if err != nil {
+			log.Fatalf("Unable to get path of database %s\n", s.Database)
+		}
+		args = f
 	default:
 		log.Fatalf("Database driver '%s' is not supported.\n", s.Driver)
 	}
