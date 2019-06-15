@@ -2,6 +2,7 @@ package config
 
 import (
 	"log"
+	"os"
 	"path/filepath"
 
 	"github.com/BurntSushi/toml"
@@ -72,7 +73,7 @@ var Settings Config
 
 // @todo revisit with map[string]interface{} to make it dynamic
 func setConfigOf(file string, v interface{}) {
-	absPath, _ := filepath.Abs(filepath.Clean("./config/" + file + ".toml"))
+	absPath, _ := filepath.Abs(filepath.Clean(filepath.Dir(os.Args[0]) + "/config/" + file + ".toml"))
 	if _, err := toml.DecodeFile(absPath, v); err != nil {
 		log.Fatalln("There was an error decoding file " + absPath + ", Error: " + err.Error())
 	}
@@ -93,6 +94,6 @@ func init() {
 	// Queue config
 	setConfigOf("queue", &Settings.Queue)
 	// Transform the relative paths into absolute.
-	Settings.Certificate.CertFile, _ = filepath.Abs(filepath.Dir("./config") + "/" + filepath.Clean(Settings.Certificate.CertFile))
-	Settings.Certificate.KeyFile, _ = filepath.Abs(filepath.Dir("./config") + "/" + filepath.Clean(Settings.Certificate.KeyFile))
+	Settings.Certificate.CertFile, _ = filepath.Abs(filepath.Dir(filepath.Dir(os.Args[0])+"/config") + "/" + filepath.Clean(Settings.Certificate.CertFile))
+	Settings.Certificate.KeyFile, _ = filepath.Abs(filepath.Dir(filepath.Dir(os.Args[0])+"/config") + "/" + filepath.Clean(Settings.Certificate.KeyFile))
 }
